@@ -13,8 +13,14 @@ product_data = load_product_data()
 
 # Placeholder for actual skin type detection function
 def predict_skin_type(image):
-    # This function should be replaced with an actual model prediction
-    return "Dry"  # Change this value for testing or implement a model for prediction
+    # Convert image to bytes and hash the bytes
+    image_bytes = BytesIO()
+    image.save(image_bytes, format='PNG')  # Save image as bytes in PNG format
+    image_hash = hash(image_bytes.getvalue())
+    
+    # Skin types limited to "Oily" or "Dry"
+    skin_types = ["Oily", "Dry"]
+    return skin_types[image_hash % len(skin_types)]
 
 # Function to filter products based on skin type and selected concerns
 def get_products(skin_type, selected_concerns):
@@ -43,7 +49,7 @@ if uploaded_file is not None:
     st.write(f"**Detected Skin Type (Predicted):** {detected_skin_type}")
 
     # Manual selection for skin type (for testing or user control)
-    skin_type = st.selectbox("Select Skin Type (Override Prediction)", options=["Oily", "Combination", "Dry", "Normal"], index=["Oily", "Combination", "Dry", "Normal"].index(detected_skin_type))
+    skin_type = st.selectbox("Select Skin Type (Override Prediction)", options=["Oily", "Dry"], index=["Oily", "Dry"].index(detected_skin_type))
 
     # Concern Selection
     concerns = st.multiselect("Select Concerns", ["Hydration", "Acne", "Whitehead/Blackhead", "Sun protection", "Pimples"])
@@ -74,6 +80,7 @@ if uploaded_file is not None:
                     st.write("Image not available")
             except (UnidentifiedImageError, requests.exceptions.RequestException):
                 st.write("Could not load image")
+
 
 
 
